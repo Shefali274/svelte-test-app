@@ -23,39 +23,41 @@
 
   let showCreateModal = false;
   let newKeyName = '';
-  let openMenuId: string | null = null;
 
+    const openMenuId = writable<string | null>(null);
 
 
   function toggleMenu(id: string) {
-  console.log('clicked', id, typeof id);
-  openMenuId = openMenuId === id ? null : id;
-  console.log('openMenuId now', openMenuId, typeof openMenuId);
+  openMenuId.update(current => current === id ? null : id);
 }
 
 function closeMenus(event: MouseEvent) {
   const target = event.target as HTMLElement;
-
   if (!target.closest('.menu-wrap')) {
-    openMenuId = null;
+    openMenuId.set(null);
   }
 }
 
-  function deleteKey(id: string) {
-    apiKeys.update(keys => keys.filter(k => k.id !== id));
-    openMenuId = null;
-  }
+function deleteKey(id: string) {
+  apiKeys.update(keys => keys.filter(k => k.id !== id));
+  openMenuId.set(null);
+}
 
-  function toggleDisable(id: string) {
-    apiKeys.update(keys =>
-      keys.map(k =>
-        k.id === id
-          ? { ...k, status: k.status === 'disabled' ? 'active' : 'disabled' }
-          : k
-      )
-    );
-    openMenuId = null;
-  }
+function toggleDisable(id: string) {
+  apiKeys.update(keys =>
+    keys.map(k =>
+      k.id === id
+        ? { ...k, status: k.status === 'disabled' ? 'active' : 'disabled' }
+        : k
+    )
+  );
+  openMenuId.set(null);
+}
+
+function isOpen(id: string): boolean {
+  // No longer needed — use $openMenuId directly in template
+  return false;
+}
 
   function createKey() {
     if (!newKeyName.trim()) return;
@@ -73,9 +75,7 @@ function closeMenus(event: MouseEvent) {
     showCreateModal = false;
   }
 
-  function isOpen(id: string) {
-  return openMenuId === id;
-}
+
 </script>
 <svelte:window on:click={closeMenus} />
 
@@ -129,7 +129,6 @@ function closeMenus(event: MouseEvent) {
             <td class="muted">{key.expires ?? '—'}</td>
             <td class="muted">{key.created}</td>
             <td class="muted">{key.lastUsed ?? 'Never'}</td>
-            <td>{openMenuId} === {key.id}</td>
             <td class="actions-cell">
               <div class="menu-wrap" on:click|stopPropagation>
                 <button class="icon-btn" on:click={() => toggleMenu(key.id)}>
@@ -139,7 +138,7 @@ function closeMenus(event: MouseEvent) {
   <path d="M1.41667 11.4167C1.78486 11.4167 2.08333 11.1182 2.08333 10.75C2.08333 10.3818 1.78486 10.0833 1.41667 10.0833C1.04848 10.0833 0.75 10.3818 0.75 10.75C0.75 11.1182 1.04848 11.4167 1.41667 11.4167Z" stroke="#FAFAFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
                 </button>
-                {#if isOpen(key.id)}
+                {#if $openMenuId === key.id}
                     <div class="dropdown">
                         <button class="dropdown-item">Edit</button>
                         <button class="dropdown-item" on:click={() => toggleDisable(key.id)}>
@@ -172,11 +171,9 @@ function closeMenus(event: MouseEvent) {
             </p>
           </div>
           <div class="card-right">
-            {#if key.status !== 'active'}
-              <span class="badge badge-{key.status}">
-                {key.status.charAt(0).toUpperCase() + key.status.slice(1)}
-              </span>
-            {/if}
+            <span class="badge badge-{key.status}">
+            {key.status.charAt(0).toUpperCase() + key.status.slice(1)}
+            </span>
             <div class="menu-wrap" on:click|stopPropagation>
               <button class="icon-btn" on:click={() => toggleMenu(key.id)}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="3" height="13" viewBox="0 0 3 13" fill="none">
@@ -185,14 +182,15 @@ function closeMenus(event: MouseEvent) {
                 <path d="M1.41667 11.4167C1.78486 11.4167 2.08333 11.1182 2.08333 10.75C2.08333 10.3818 1.78486 10.0833 1.41667 10.0833C1.04848 10.0833 0.75 10.3818 0.75 10.75C0.75 11.1182 1.04848 11.4167 1.41667 11.4167Z" stroke="#FAFAFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </button>
-              {#if openMenuId === key.id + '-m'}
+             {#if $openMenuId === key.id}
                 <div class="dropdown dropdown-left">
-                  <button class="dropdown-item" on:click={() => toggleDisable(key.id)}>
+                    <button class="dropdown-item">Edit</button>  <!-- add this -->
+                    <button class="dropdown-item" on:click={() => toggleDisable(key.id)}>
                     {key.status === 'disabled' ? 'Enable' : 'Disable'}
-                  </button>
-                  <button class="dropdown-item danger" on:click={() => deleteKey(key.id)}>Delete</button>
+                    </button>
+                    <button class="dropdown-item danger" on:click={() => deleteKey(key.id)}>Delete</button>
                 </div>
-              {/if}
+                {/if}
             </div>
           </div>
         </div>

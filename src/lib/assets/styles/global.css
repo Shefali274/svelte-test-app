@@ -14,7 +14,7 @@ body {
 	}
 
 	/* ── Sidebar ── */
-	.sidebar {
+	/* .sidebar {
 		width: 200px;
 		min-height: 100vh;
 		background: #121212;
@@ -25,7 +25,71 @@ body {
 		position: fixed;
 		top: 0; left: 0; bottom: 0;
 		z-index: 50;
-	}
+	} */
+
+    .sidebar {
+  width: 200px;
+  min-height: 100vh;
+  background: #121212;
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+  transition: width 0.25s ease; /* ADD */
+  overflow: hidden;              /* ADD */
+}
+
+.logo-svg-wrap {
+  overflow: hidden;
+  transition: width 0.25s ease, opacity 0.2s ease;
+  width: 74px;
+  opacity: 1;
+}
+
+.sidebar.collapsed .logo-svg-wrap {
+  width: 0;
+  opacity: 0;
+}
+
+/* ADD this block */
+.sidebar.collapsed {
+  width: 52px;
+}
+
+.sidebar.collapsed .section-label,
+.sidebar.collapsed .nav-link span,
+.sidebar.collapsed .nav-link-label {
+  display: none;
+}
+
+.sidebar.collapsed .nav-link {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 8px 0 20px;
+}
+/* ADD this - always show the button */
+.sidebar.collapsed .collapse-btn {
+  display: flex;
+}
+
+.main-content {
+  margin-left: 200px;
+  flex: 1;
+  min-height: 100vh;
+  transition: margin-left 0.25s ease; /* ADD */
+}
+
+/* ADD this block */
+.main-content.sidebar-collapsed {
+  margin-left: 52px;
+}
 
 	.sidebar-logo {
 		display: flex;
@@ -114,11 +178,26 @@ body {
 	}
 
 	/* ── Main Content ── */
-	.main-content {
+	/* .main-content {
 		margin-left: 200px;
 		flex: 1;
 		min-height: 100vh;
-	}
+	} */
+
+     .collapse-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.collapse-btn:hover { background: #262626; }
 
 	/* ── Bottom Nav (mobile only) ── */
 	.bottom-nav { display: none; }
